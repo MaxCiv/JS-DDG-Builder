@@ -15,4 +15,9 @@ public class ActionBlockCFG extends AbstractBlockCFG {
     public void setChild(BlockCFG block) {
         child = block;
     }
+
+    @Override
+    public BlockCFG getChild() {
+        return child;
+    }
 }

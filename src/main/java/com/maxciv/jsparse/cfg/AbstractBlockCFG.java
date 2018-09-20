@@ -16,6 +16,11 @@ public abstract class AbstractBlockCFG implements BlockCFG {
     }
 
     @Override
+    public void setParents(Collection<BlockCFG> block) {
+        parentBlocks = new ArrayList<>(block);
+    }
+
+    @Override
     public void addParents(Collection<BlockCFG> block) {
         parentBlocks.addAll(block);
     }
@@ -34,5 +39,10 @@ public abstract class AbstractBlockCFG implements BlockCFG {
 
     @Override
     public void setCondition(Tree condition) {
+    }
+
+    @Override
+    public BlockCFG getChild() {
+        return null;
     }
 }
