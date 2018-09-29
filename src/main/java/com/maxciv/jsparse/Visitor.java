@@ -28,10 +28,6 @@ public class Visitor extends SimpleTreeVisitorES5_1<List<BlockCFG>, List<BlockCF
         for (StatementTree tree : node.getStatements()) {
             List<BlockCFG> newBlocks = tree.accept(this, previousBlocks);
             if (newBlocks == null) continue;
-            previousBlocks.forEach(blockCFG -> blockCFG.setChild(newBlocks.get(0)));
-            for (BlockCFG blockCFG : newBlocks) {
-                blockCFG.addParents(previousBlocks);
-            }
             previousBlocks = newBlocks;
         }
         return previousBlocks;
@@ -40,20 +36,20 @@ public class Visitor extends SimpleTreeVisitorES5_1<List<BlockCFG>, List<BlockCF
     @Override
     public List<BlockCFG> visitIf(IfTree node, List<BlockCFG> r) {
         ConditionBlockCFG conditionBlockCFG = new ConditionBlockCFG(node.getCondition());
-        r.forEach(blockCFG -> blockCFG.setChild(conditionBlockCFG));
-        conditionBlockCFG.addParents(r);
-        ActionBlockCFG thenBlockCFG = new ActionBlockCFG(node.getCondition());
-        ActionBlockCFG elseBlockCFG = new ActionBlockCFG(node.getCondition());
+        setParentsAndChildren(r, Collections.singletonList(conditionBlockCFG));
 
-        List<BlockCFG> thenBlocks = node.getThenStatement().accept(this, Collections.singletonList(thenBlockCFG));
-        conditionBlockCFG.setThenChild(thenBlockCFG.getChild());
-        thenBlockCFG.getChild().setParents(Collections.singletonList(conditionBlockCFG));
+        ActionBlockCFG thenCommonBlockCFG = new ActionBlockCFG(node.getCondition());
+        ActionBlockCFG elseCommonBlockCFG = new ActionBlockCFG(node.getCondition());
+
+        List<BlockCFG> thenBlocks = node.getThenStatement().accept(this, Collections.singletonList(thenCommonBlockCFG));
+        conditionBlockCFG.setThenChild(thenCommonBlockCFG.getChild());
+        thenCommonBlockCFG.getChild().setParents(Collections.singletonList(conditionBlockCFG));
 
         List<BlockCFG> elseBlocks = new ArrayList<>();
         if (node.getElseStatement() != null) {
-            elseBlocks.addAll(node.getElseStatement().accept(this, Collections.singletonList(elseBlockCFG)));
-            conditionBlockCFG.setElseChild(elseBlockCFG.getChild());
-            elseBlockCFG.getChild().setParents(Collections.singletonList(conditionBlockCFG));
+            elseBlocks.addAll(node.getElseStatement().accept(this, Collections.singletonList(elseCommonBlockCFG)));
+            conditionBlockCFG.setElseChild(elseCommonBlockCFG.getChild());
+            elseCommonBlockCFG.getChild().setParents(Collections.singletonList(conditionBlockCFG));
         }
 
         List<BlockCFG> returnList = new ArrayList<>(thenBlocks);
@@ -64,31 +60,47 @@ public class Visitor extends SimpleTreeVisitorES5_1<List<BlockCFG>, List<BlockCF
     @Override
     public List<BlockCFG> visitForLoop(ForLoopTree node, List<BlockCFG> r) {
         final Tree init = node.getInitializer();
+        ActionBlockCFG initActionBlockCFG = null;
         if (init != null) {
-            init.accept(this, r);
+            initActionBlockCFG = new ActionBlockCFG(init);
+            setParentsAndChildren(r, Collections.singletonList(initActionBlockCFG));
         }
 
         final Tree cond = node.getCondition();
-        if (cond != null) {
-            cond.accept(this, r);
-        }
+        ConditionBlockCFG conditionBlockCFG = new ConditionBlockCFG(cond);
+        if (initActionBlockCFG == null) {
+            setParentsAndChildren(r, Collections.singletonList(conditionBlockCFG));
+        } else
+            setParentsAndChildren(Collections.singletonList(initActionBlockCFG), Collections.singletonList(conditionBlockCFG));
+
+        final Tree statement = node.getStatement();
+        ActionBlockCFG commonBlockCFG = new ActionBlockCFG(node.getCondition());
+
+        List<BlockCFG> endBlocks = statement.accept(this, Collections.singletonList(commonBlockCFG));
+        conditionBlockCFG.setThenChild(commonBlockCFG.getChild());
+        commonBlockCFG.getChild().setParents(Collections.singletonList(conditionBlockCFG));
 
         final Tree update = node.getUpdate();
+        ActionBlockCFG updateActionBlockCFG = null;
         if (update != null) {
-            update.accept(this, r);
+            updateActionBlockCFG = new ActionBlockCFG(update);
+            setParentsAndChildren(endBlocks, Collections.singletonList(updateActionBlockCFG));
         }
+        if (updateActionBlockCFG == null) {
+            setParentsAndChildren(endBlocks, Collections.singletonList(conditionBlockCFG));
+        } else
+            setParentsAndChildren(Collections.singletonList(updateActionBlockCFG), Collections.singletonList(conditionBlockCFG));
 
-        node.getStatement().accept(this, r);
-
-        ActionBlockCFG actionBlockCFG = new ActionBlockCFG(node);
-
-        return Collections.singletonList(actionBlockCFG);
+        ActionBlockCFG exitActionBlockCFG = new ActionBlockCFG(null);
+        exitActionBlockCFG.addParent(conditionBlockCFG);
+        conditionBlockCFG.setElseChild(exitActionBlockCFG);
+        return Collections.singletonList(exitActionBlockCFG);
     }
 
     @Override
     public List<BlockCFG> visitVariable(VariableTree node, List<BlockCFG> r) {
         ActionBlockCFG actionBlockCFG = new ActionBlockCFG(node);
-
+        setParentsAndChildren(r, Collections.singletonList(actionBlockCFG));
         return Collections.singletonList(actionBlockCFG);
     }
 
@@ -97,7 +109,7 @@ public class Visitor extends SimpleTreeVisitorES5_1<List<BlockCFG>, List<BlockCF
 //        return super.visitExpressionStatement(node, r);
 
         ActionBlockCFG actionBlockCFG = new ActionBlockCFG(node);
-
+        setParentsAndChildren(r, Collections.singletonList(actionBlockCFG));
         return Collections.singletonList(actionBlockCFG);
     }
 
@@ -109,7 +121,16 @@ public class Visitor extends SimpleTreeVisitorES5_1<List<BlockCFG>, List<BlockCF
         }
 
         ActionBlockCFG actionBlockCFG = new ActionBlockCFG(node);
-
+        setParentsAndChildren(r, Collections.singletonList(actionBlockCFG));
         return Collections.singletonList(actionBlockCFG);
+    }
+
+    /**
+     * Установить родителям детей и детям родителей
+     */
+    private void setParentsAndChildren(List<BlockCFG> parents, List<BlockCFG> children) {
+        if (children == null || parents == null) return;
+        parents.forEach(parent -> parent.setChild(children.get(0)));
+        children.forEach(child -> child.addParents(parents));
     }
 }
