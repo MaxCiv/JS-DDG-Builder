@@ -10,6 +10,8 @@ public class ConditionBlockCFG extends AbstractBlockCFG {
 
     public ConditionBlockCFG(Tree condition) {
         this.condition = condition;
+        fillVariables(condition);
+        stringRepresentation = getStringFromKind(condition.getKind(), condition);
     }
 
     @Override

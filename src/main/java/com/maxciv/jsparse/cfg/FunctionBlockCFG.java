@@ -9,6 +9,8 @@ public class FunctionBlockCFG extends AbstractBlockCFG {
 
     public FunctionBlockCFG(FunctionDeclarationTree node) {
         this.node = node;
+        fillVariables(node);
+        stringRepresentation = getStringFromKind(node.getKind(), node);
     }
 
     @Override

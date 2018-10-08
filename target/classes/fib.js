@@ -1,6 +1,6 @@
-function fib(n) {
+function fib(n, x, y) {
     var a = 0, b = 1, c, i, dummy;
-    if (n < 2) {
+    if (n < 2 + 1 + 1) {
         return n;
     } else {
         if (n > 999) {
@@ -8,8 +8,10 @@ function fib(n) {
         } else {
             dummy = 8;
         }
-        dummy = 9;
+        dummy = dummy + 9;
+        if (n < 23894) dummy = 10;
     }
+
     for (i = 1; i < n; i++) {
         c = a + b;
         a = b;

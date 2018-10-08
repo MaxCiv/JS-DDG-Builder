@@ -1,6 +1,6 @@
-function fib(n) {
+function fib(n, x, y) {
     var a = 0, b = 1, c, i, dummy;
-    if (n < 2) {
+    if (n < 2 + 1 + 1) {
         return n;
     } else {
         if (n > 999) {

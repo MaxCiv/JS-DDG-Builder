@@ -50,9 +50,15 @@ public class Visitor extends SimpleTreeVisitorES5_1<List<BlockCFG>, List<BlockCF
             elseBlocks.addAll(node.getElseStatement().accept(this, Collections.singletonList(elseCommonBlockCFG)));
             conditionBlockCFG.setElseChild(elseCommonBlockCFG.getChild());
             elseCommonBlockCFG.getChild().setParents(Collections.singletonList(conditionBlockCFG));
+        } else {
+            ActionBlockCFG emptyBlock = new ActionBlockCFG(null);
+            elseBlocks.add(emptyBlock);
+            conditionBlockCFG.setElseChild(emptyBlock);
+            emptyBlock.setParents(Collections.singletonList(conditionBlockCFG));
         }
 
-        List<BlockCFG> returnList = new ArrayList<>(thenBlocks);
+        List<BlockCFG> returnList = new ArrayList<>();
+        returnList.addAll(thenBlocks);
         returnList.addAll(elseBlocks);
         return returnList;
     }
@@ -106,8 +112,6 @@ public class Visitor extends SimpleTreeVisitorES5_1<List<BlockCFG>, List<BlockCF
 
     @Override
     public List<BlockCFG> visitExpressionStatement(ExpressionStatementTree node, List<BlockCFG> r) {
-//        return super.visitExpressionStatement(node, r);
-
         ActionBlockCFG actionBlockCFG = new ActionBlockCFG(node);
         setParentsAndChildren(r, Collections.singletonList(actionBlockCFG));
         return Collections.singletonList(actionBlockCFG);
