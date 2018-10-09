@@ -1,6 +1,7 @@
 package com.maxciv.jsparse.cfg;
 
 import jdk.nashorn.api.tree.FunctionDeclarationTree;
+import jdk.nashorn.api.tree.Tree;
 
 public class FunctionBlockCFG extends AbstractBlockCFG {
 
@@ -16,6 +17,11 @@ public class FunctionBlockCFG extends AbstractBlockCFG {
     @Override
     public void setChild(BlockCFG block) {
         child = block;
+    }
+
+    @Override
+    public Tree getExpression() {
+        return node;
     }
 
     @Override

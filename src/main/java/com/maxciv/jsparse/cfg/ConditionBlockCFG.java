@@ -30,6 +30,11 @@ public class ConditionBlockCFG extends AbstractBlockCFG {
     }
 
     @Override
+    public Tree getExpression() {
+        return condition;
+    }
+
+    @Override
     public BlockCFG getThenChild() {
         return thenChild;
     }

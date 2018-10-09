@@ -16,6 +16,7 @@ public interface BlockCFG {
     void setElseChild(BlockCFG block);
     void setCondition(Tree condition);
 
+    Tree getExpression();
     BlockCFG getChild();
     BlockCFG getThenChild();
     BlockCFG getElseChild();

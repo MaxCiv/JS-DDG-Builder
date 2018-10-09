@@ -24,6 +24,11 @@ public class ActionBlockCFG extends AbstractBlockCFG {
     }
 
     @Override
+    public Tree getExpression() {
+        return expression;
+    }
+
+    @Override
     public BlockCFG getChild() {
         return child;
     }
