@@ -28,4 +28,14 @@ public class ConditionBlockCFG extends AbstractBlockCFG {
     public void setCondition(Tree condition) {
         this.condition = condition;
     }
+
+    @Override
+    public BlockCFG getThenChild() {
+        return thenChild;
+    }
+
+    @Override
+    public BlockCFG getElseChild() {
+        return elseChild;
+    }
 }

@@ -3,6 +3,7 @@ package com.maxciv.jsparse.cfg;
 import jdk.nashorn.api.tree.Tree;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 public interface BlockCFG {
 
@@ -16,4 +17,12 @@ public interface BlockCFG {
     void setCondition(Tree condition);
 
     BlockCFG getChild();
+    BlockCFG getThenChild();
+    BlockCFG getElseChild();
+    String getStringRepresentation();
+    HashSet<String> getDependentVariables();
+    HashSet<String> getDependencies();
+    HashSet<BlockCFG> getDependentBlocks();
+
+    boolean addToDependentBlocks(BlockCFG blockCFG);
 }

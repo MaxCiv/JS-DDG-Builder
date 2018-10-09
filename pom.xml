@@ -8,6 +8,16 @@
     <artifactId>JSparse</artifactId>
     <version>1.0.0</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.mxgraph</groupId>
+            <artifactId>jgraphx</artifactId>
+            <version>3.9.10</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/jgraphx.jar</systemPath>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

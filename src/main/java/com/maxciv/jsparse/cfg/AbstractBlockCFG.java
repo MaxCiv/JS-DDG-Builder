@@ -13,6 +13,8 @@ public abstract class AbstractBlockCFG implements BlockCFG {
     private HashSet<String> dependencies = new HashSet<>(); // переменные, от которых зависит выражение
     // dependentVariable = dependency1 + (dependency2 * 2)
 
+    private HashSet<BlockCFG> dependentBlocks = new HashSet<>();  // стрелки идут от this блока к списку блоков dependentBlocks
+
     @Override
     public void addParent(BlockCFG block) {
         parentBlocks.add(block);
@@ -49,11 +51,46 @@ public abstract class AbstractBlockCFG implements BlockCFG {
         return null;
     }
 
+    @Override
+    public BlockCFG getThenChild() {
+        return null;
+    }
+
+    @Override
+    public BlockCFG getElseChild() {
+        return null;
+    }
+
+    @Override
+    public String getStringRepresentation() {
+        return stringRepresentation;
+    }
+
+    @Override
+    public HashSet<String> getDependentVariables() {
+        return dependentVariables;
+    }
+
+    @Override
+    public HashSet<String> getDependencies() {
+        return dependencies;
+    }
+
+    @Override
+    public HashSet<BlockCFG> getDependentBlocks() {
+        return dependentBlocks;
+    }
+
+    @Override
+    public boolean addToDependentBlocks(BlockCFG blockCFG) {
+        return dependentBlocks.add(blockCFG);
+    }
+
     /**
      * Разбираем блок в соответствии с его типом и находим переменные,
      * от которых он зависит, и переменную, которую он представляет.
      */
-    public void fillVariables(Tree tree) {
+    protected void fillVariables(Tree tree) {
         Tree.Kind kind = tree.getKind();
         switch (kind) {
             case FUNCTION:
@@ -298,5 +335,4 @@ public abstract class AbstractBlockCFG implements BlockCFG {
                 return "SOMETHING WENT WRONG (getOperationString) KIND = " + kind.name();
         }
     }
-
 }
